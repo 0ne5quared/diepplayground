@@ -19,7 +19,7 @@
 import GameServer from "../../Game";
 import ObjectEntity from "../Object";
 import AutoTurret from "./AutoTurret";
-
+import ReverseAutoTurretMachineGun from "./ReverseAutoTurretMachineGun";
 import { Color, PositionFlags, PhysicsFlags, StyleFlags } from "../../Const/Enums";
 import { BarrelBase } from "./TankBody";
 import { addonId, BarrelDefinition } from "../../Const/TankDefinitions";
@@ -278,6 +278,9 @@ class AutoTurretAddon extends Addon {
     }
 }
 
+
+
+
 /** Smasher + Centered Auto Turret addon. */
 class AutoSmasherAddon extends Addon {
     public constructor(owner: BarrelBase) {
@@ -345,6 +348,38 @@ class PronouncedDomAddon extends Addon {
         const sizeRatio = 22 / 50;
         const widthRatio = 35 / 50;
         const offsetRatio = 50 / 50;
+        const size = this.owner.physicsData.values.size;
+
+        pronounce.setParent(this.owner);
+        pronounce.relationsData.values.owner = this.owner;
+        pronounce.relationsData.values.team = this.owner.relationsData.values.team
+
+        pronounce.physicsData.values.size = sizeRatio * size;
+        pronounce.physicsData.values.width = widthRatio * size;
+        pronounce.positionData.values.x = offsetRatio * size;
+        pronounce.positionData.values.angle = Math.PI;
+        
+        pronounce.styleData.values.color = Color.Barrel;
+        pronounce.physicsData.values.flags |= PhysicsFlags.isTrapezoid;
+        pronounce.physicsData.values.sides = 2;
+
+        pronounce.tick = () => {
+            const size = this.owner.physicsData.values.size;
+
+            pronounce.physicsData.size = sizeRatio * size;
+            pronounce.physicsData.width = widthRatio * size;
+            pronounce.positionData.x = offsetRatio * size;
+        }
+    }
+}
+class PronouncedShotgunAddon extends Addon {
+    public constructor(owner: BarrelBase) {
+        super(owner);
+
+        const pronounce = new ObjectEntity(this.game);
+        const sizeRatio = 50 / 50;
+        const widthRatio = 52 / 50;
+        const offsetRatio = 38 / 50;
         const size = this.owner.physicsData.values.size;
 
         pronounce.setParent(this.owner);
@@ -439,6 +474,15 @@ class SpieskAddon extends Addon {
     }
 }
 
+/** ReverseAutoTurretMachineGun. */
+class ReverseAutoTurretMachineGunAddon extends Addon {
+    public constructor(owner: BarrelBase) {
+        super(owner);
+
+        new ReverseAutoTurretMachineGun(owner);
+    }
+}
+
 /**
  * All addons in the game by their ID.
  */
@@ -451,6 +495,7 @@ export const AddonById: Record<addonId, typeof Addon | null> = {
     auto3: Auto3Addon,
     autosmasher: AutoSmasherAddon,
     pronounced: PronouncedAddon,
+    shotgunpronounced :PronouncedShotgunAddon,
     smasher: SmasherAddon,
     landmine: LandmineAddon,
     autoturret: AutoTurretAddon,
@@ -460,4 +505,5 @@ export const AddonById: Record<addonId, typeof Addon | null> = {
     auto2: Auto2Addon,
     autorocket: AutoRocketAddon,
     spiesk: SpieskAddon,
+    reverseautoturretmachinegun: ReverseAutoTurretMachineGunAddon
 }
